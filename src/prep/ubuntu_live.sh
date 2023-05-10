@@ -4,36 +4,44 @@
 # 1024MB as otherwise it errors out (running out of cache/RAM space)
 
 main() {
+    if [ $(id -u) -ne 0 ]; then echo "Please run as root!"; exit 1; fi
     if [ -z "$HOME" ]; then HOME="/root" ; fi
-    prep_packages=""
+    RELEASE="kinetic"
+    prep_packages=(debootstrap dialog ntp tmux zip unzip tar) # btrfs-progs
 
-    sync_time
-    echo "Please wait for 30 seconds!"
-    sleep 30 # Wait before updating repo and downloading packages
-    fixdb
+  # attempt to install and if errors sync time and database
+    apt-get -y --fix-broken install $prep_packages
+    [ $? != 0 ] && sync_time && echo "Please wait for 30 seconds!" && sleep 30 && fixdb && apt-get -y --fix-broken install $prep_packages
+
     configs
     #git clone http://github.com/ashos/ashos
     #git config --global --add safe.directory ./ashos # prevent fatal error "unsafe repository is owned by someone else"
     #cd ashos
-    #/bin/bash ./src/prep/parted_gpt_example.sh $2
+    dialog --stdout --msgbox "CAUTION: If you hit Okay, your HDD will be partitioned. You should confirm you edited script in prep folder!" 0 0
+    /bin/bash ./src/prep/parted_gpt_example.sh $2
     #python3 setup.py $1 $2 $3
 }
 
 # Configurations
 configs() {
-    echo "export LC_ALL=C LC_CTYPE=C LANGUAGE=C" | tee -a $HOME/.bashrc
-    #echo "alias p='curl -F "'"sprunge=<-"'" sprunge.us'" | tee -a $HOME/.bashrc
-    echo "alias p='curl -F "'"f:1=<-"'" ix.io'" | tee -a $HOME/.bashrc
-    echo "alias d='df -h | grep -v sda'" | tee -a $HOME/.bashrc
-    echo "setw -g mode-keys vi" | tee -a $HOME/.tmux.conf
-    echo "set -g history-limit 999999" | tee -a $HOME/.tmux.conf
+    setfont Lat38-TerminusBold24x12 # /usr/share/consolefonts/
+    echo "export LC_ALL=C LC_CTYPE=C LANGUAGE=C" >> $HOME/.bashrc
+    #echo "alias p='curl -F "'"sprunge=<-"'" sprunge.us'" >> $HOME/.bashrc
+    echo "alias p='curl -F "'"f:1=<-"'" ix.io'" >> $HOME/.bashrc
+    echo "alias d='df -h | grep -v sda'" >> $HOME/.bashrc
+    echo "setw -g mode-keys vi" >> $HOME/.tmux.conf
+    echo "set -g history-limit 999999" >> $HOME/.tmux.conf
 }
 
 # Remove man pages (fixes slow man-db trigger)
 fixdb() {
+    add-apt-repository -y universe # ntp
     apt-get -y autoremove
     apt-get -y autoclean
+    apt-get -y clean # Needed?
     apt-get -y remove --purge man-db # Fix slow man-db trigger
+    apt-get -y update
+    apt-get -y check # Needed?
 }
 
 # Sync time

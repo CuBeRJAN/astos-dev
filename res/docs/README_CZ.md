@@ -6,6 +6,10 @@
 
 ---
 
+**Please note that, for the purpose of this project, conforming to 'pythonic' way was not a goal as in future, implementation might change to Rust, C, C++, etc. We would like to be as close to POSIX-compliant sans-bashism shell as possible.**
+
+---
+
 ## Obsah
 
 - [Co je astOS?](https://github.com/astos/astos/blob/main/README_CZ.md#co-je-astos)
@@ -23,9 +27,9 @@
 
 ## Co je astOS?
 
-astOS je moderní distribuce založená na [Arch Linuxu](https://archlinux.org).  
-Na rozdíl od Archu používá neměnný (pouze pro čtení) kořenový souborový systém.  
-Software je instalován a konfigurován do jednotlivých stromů snímků, které lze následně nasadit a zavést do systému.  
+astOS je moderní distribuce založená na [Arch Linuxu](https://archlinux.org).
+Na rozdíl od Archu používá neměnný (pouze pro čtení) kořenový souborový systém.
+Software je instalován a konfigurován do jednotlivých stromů snímků, které lze následně nasadit a zavést do systému.
 Nepoužívá vlastní formát balíčků ani správce balíčků, místo toho se spoléhá na [pacman](https://wiki.archlinux.org/title/pacman) z Archu.
 
 **To má několik výhod:**
@@ -313,3 +317,4 @@ sudo chmod 666 /var/run/docker.sock
 ---
 
 **Projekt je licencován pod licencí AGPLv3**
+

@@ -1,21 +1,25 @@
 <p align="center">
   <img src="res/logos/logo.png" alt="AshOS">
   <br>
-  [<a href="res/docs/README_CZ.md">Čeština</a>] | [<a href="res/docs/README_zh-CN.md">中文</a>] | [<a href="res/docs/README_FA.md">فارسی</a>]
+  [<a href="res/docs/README_CZ.md">Čeština</a>] | [<a href="res/docs/README_zh-CN.md">中文</a>] | [<a href="res/docs/README_FA.md">پارسی</a>]
   <br>
   <b>We need your help to translate this README. <a href="https://github.com/i2/ashos-dev/tree/main/res/docs">Look here!</a></b>
 </p>
 
 # AshOS (Any Snapshot Hierarchical OS)
 ### An immutable tree-shaped meta-distribution using snapshots
-###### (for mere mortals!)
+###### (No, this is not yet another skin/themed "distro"!)
+
+---
+
+**Please note that, for the purpose of this project, conforming to 'pythonic' way was not a goal as in future, implementation might change to Rust, C, C++, etc. We would like to be as close to POSIX-compliant sans-bashism shell as possible.**
 
 ---
 
 ## Table of contents
 * [What is AshOS?](https://github.com/ashos/ashos#what-is-ashos)
 * [AshOS compared to other similar distributions](https://github.com/ashos/ashos#ashos-compared-to-other-similar-distributions)
-* [ash and AshOS documentation](https://github.com/ashos/ashos#additional-documentation)
+* [ash and AshOS documentation](https://github.com/ashos/ashos#ashos-documentation)
   * [Installation](https://github.com/ashos/ashos#installation)
   * [Post installation](https://github.com/ashos/ashos#post-installation-setup)
   * [Snapshot management and deployments](https://github.com/ashos/ashos#snapshot-management)
@@ -32,22 +36,27 @@
   * [LUKS](https://github.com/ashos/ashos#luks)
   * [Mutability toggle](https://github.com/ashos/ashos#mutability-toggle)
   * [Debugging ash](https://github.com/ashos/ashos#debugging-ash)
+  * [Debuggin installer](https://github.com/ashos/ashos#debugging-installer)
 * [Known bugs](https://github.com/ashos/ashos#known-bugs)
 * [Contributing](https://github.com/ashos/ashos#contributing)
 * [Community](https://github.com/ashos/ashos#community)
 * [ToDos](https://github.com/ashos/ashos#todos)
 * [Distro-Specific Notes](https://github.com/ashos/ashos#distro-notes)
-  * [Debian](https://github.com/ashos/ashos#debian)
   * [Arch](https://github.com/ashos/ashos#arch-linux)
     * [AUR](https://github.com/ashos/ashos#aur)
     * [Fixing pacman corrupt packages or key issues](https://github.com/ashos/ashos#fixing-pacman-corrupt-packages-or-key-issues)
+  * [Alpine](https://github.com/ashos/ashos#proxmox)
+  * [CachyOS](https://github.com/ashos/ashos#cachyos)
+  * [Debian](https://github.com/ashos/ashos#debian)
   * [EndeavourOS](https://github.com/ashos/ashos#endeavouros)
+  * [Proxmox](https://github.com/ashos/ashos#proxmox)
+  * [Ubuntu](https://github.com/ashos/ashos#ubuntu)
 
 ---
 
 ## What is AshOS?
 
-You always wanted to try Fedora Rawhide but after a few days, its fragility got on your nerves. Then, maybe you tried Fedora Silverblue Rawhide but then its complicated and slow git-like ostree operations killed your mood! Well, no more! Now you can try this bleeding edge distro (and many more distros like Debian sid) with more peace of mind.
+You always wanted to try Fedora Rawhide but after a few days, its fragility got on your nerves. Then, maybe you tried Fedora Silverblue Rawhide but then its complicated and slow git-like ostree operations killed your mood! Well, no more! Now you can try this bleeding edge distro (and many more distros like Debian sid) with more peace of mind. AshOS provides ultimate flexibility for installing operating systems, for instance you can easily setup an immutable Proxmox VE!
 
 AshOS is a unique meta-distribution that:
 * aims to bring immutability even to distros that do not have this very useful feature i.e. Arch Linux, Gentoo, etc.
@@ -64,7 +73,7 @@ Ashes are one of the oldest trees in the world and they inspired naming AshOS.
 In AshOS, there are several keywords:
 * Vanilla: we try to be as close to the "vanilla" version of target distribution that is being installed.
 * Minimalism: we adhere to a lego build system. Start small and build as complex a system as you would like. The main focus of development is on having a solid minimal installed snapshot, based on which user can have infinite immutable permutations!
-* Generality: As we want the most common denominator between distros, when there is a choice between convenience and comprehensiveness/generality, we go with the latter. To clarify with an example, it might be easier to use grub-btrfs instead of implementing our own GRUB update mechanism, but because that particular package might not be available in all distros, we develop an AshOS specific solution. This way, we can potentially cater to any distro in future!
+* Generality: We strive to cater for the most common denominator between distros and architectures (x64, aarch64, sparc, etc). As such, when there is a choice between convenience and comprehensiveness/generality, we go with the latter. To clarify with an example, it might be easier to use grub-btrfs instead of implementing our own GRUB update mechanism, but because that particular package might not be readily available in all distros, we develop an AshOS specific solution. This way, we can potentially cater to any distro in future!
 
 **This has several advantages:**
 
@@ -109,7 +118,7 @@ For instance to install GNOME in snapshot 1:
 ## Installation
 * (Note: All scripts during install should be run with super user privileges)
 * AshOS is installed from the official live iso for target distribution. For example [Arch Linux](https://archlinux.org/download/), [Debian](https://www.debian.org/CD/http-ftp/)/[Debian netinstaller](https://www.debian.org/distrib/netinst) etc.
-* Arch iso can be generally used to bootstrap other distros except: Use Debian iso to bootstrap Debian, Ubuntu iso to bootstrap Ubuntu
+* Arch iso can be generally used to bootstrap other distros except: Use Debian live iso-hybrid to bootstrap Debian, Ubuntu iso to bootstrap Ubuntu
 * Depending on the live iso, it is **very important** that scripts in `./src/prep/` be executed (preparing live environment as well as partition/formatting) otherwise there would be error because time is not in sync etc. By default the installer will call these scripts, but if you want to do them manually, just comment the respective lines
 * The commands to fix package db issues in live iso (i.e. arch_live.iso) take a long time to run. One can comment these to have installer run significantly faster. They are included mostly for virtual machine installation where time syncing issues are abundant.
 * If you run into issues installing packages during installation, make sure you're using the newest iso, and update the package manager's keyring if needed
@@ -154,14 +163,14 @@ python3 setup.py /dev/<root_partition> /dev/<drive> [/dev/<efi part>] [distro_id
 
 Here are 3 example scenarios:
 
-example 1 (BIOS): python3 setup.py /dev/vda1 /dev/sda
-This is a simpe case when using same distro's iso file
+example 1 (BIOS): python3 setup.py /dev/vda1 /dev/vda
+This is a simple case when iso from the `same distro` is used
 
 example 2 (UEFI): python3 setup.py /dev/nvm0p2 /dev/nvm0 /dev/nvm0p1 fedora "Fedora Linux"
 When installing a distro using another distro's iso, the last two arguments are necessary
 
 example 3 (UEFI): python3 setup.py /dev/sda2 /dev/sda /dev/sda1 cachyos "CachyOS Linux"
-If for any reason, there is a mismatch between what distro actually is and its /etc/os-release file, it is [usually] mandatory to pass two additional arguments. Here even though we are using Cachyos iso file (which is based on Arch Linux), by investigating in /etc/os-release file, you would see ID and NAME are same as Arch Linux. In a single boot install, it is okay to not pass the last two arguments, but if you want a multiboot system (say dual boot with Arch Linux), they are required.
+If for any reason, there is a mismatch between what distro actually is and its /etc/os-release file, it is [usually] mandatory to pass two additional arguments. Here even though we are using CachyOS iso file (which is based on Arch Linux), by investigating in /etc/os-release file, you would see ID and NAME are same as Arch Linux. In a single boot install, it is okay to not pass the last two arguments, but if you want a multiboot system (say dual boot with Arch Linux), they are required.
 
 ```
 The arguments inside square brackets are optional. Regarding the fourth argument: say if you want to install Alpine Linux using Arch Linux iso, run `python3 setup.py /dev/vda2 /dev/vda /dev/vda1 alpine`.
@@ -186,6 +195,7 @@ The arguments inside square brackets are optional. Regarding the fourth argument
 * **Ideally, we would like to keep Ash as a single file executable**
 * ash script is divided into 2 files: common code (ashpk_core.py) and distro specific code (i.e gentoo.py). Note that neither of these files can be run standalone (import one script into the other is not intended). The division is just to ease using files as templates in developing Ash for other distributions. At the time of installing a distro, the two files are simply concatenated.
 * To not need additional fonts, we use ASCII style when printing ash tree. For a nicer output, feel free to replace AsciiStyle() with ContStyle(), ContRoundStyle(), or DoubleStyle()
+* The other nice thing about AshOS is your related-distros are very similarly built. For instance, installer for Arch and Manjaro are very similar, difference just being the package repos!
 
 #### Base snapshot
 * The snapshot ```0``` is reserved for the base system snapshot, it cannot be changed and can only be updated using ```ash base-update```
@@ -270,7 +280,7 @@ ash tree-run <tree> <command>
 ash clone <snapshot>
 ```
 
-#### Clone a tree recursively  
+#### Clone a tree recursively
 * This clones an entire tree recursively
 
 ```
@@ -498,6 +508,13 @@ Within the forest/tree of AshOS, one can make any snapshot (other than base `0`)
 sed -e 's| >/dev/null 2>&1||g' /usr/bin/ash > ashpk.py
 ```
 
+#### Debugging installer
+
+* While working on any OS development project, a lot of issues might come up. It's just the nature of debugging in this project and needs patience!
+* When facing issues in installer or after initial setup is done, go to GRUB and delete `quiet` from arguments
+* Boot using Ctrl+X and report what you observe
+* If possible, go to TTY2 by Ctrl+Alt+F2 and run `journalctl -b` and report back
+
 ## Known bugs
 
 * At the end of installer if LUKS is used, there would be warning `remove ioctl device or resource busy`. They can be ignore. Most likely cause: systemd-journald
@@ -523,7 +540,7 @@ sudo chmod 666 /var/run/docker.sock
 * When adding contributing code to the project, always follow fork-and-clone approach: Fork the main organizational repo (ashos/ashos) under your personal git, make the changes, push your changes to your git, and finally create a pull request back to main repo.
 
 # Community
-* Please feel free to join us on [Discord](https://discord.gg/YVHEC6XNZw) for further discussion and support!
+* Please feel free to join us on [Matrix](https://matrix.to/#/#ashos:matrix.org) or [Discord](https://discord.gg/YVHEC6XNZw) for further discussion and support!
 * Happy worry-free snapshotting!
 
 # ToDos
@@ -531,12 +548,8 @@ sudo chmod 666 /var/run/docker.sock
 * Implement AUR package maintenance between snapshots
 * Make AshOS more accessible to non-advanced users
 
-# Distro-Notes
+# Distro-Specific Notes
 * For packages-distro.conf, the leanest display manager (either Xorg or Wayland) that is included in the official repo for the given distro would be included. For instance for Arch Linux, this would be 'slim', even though there are slimmer display managers like 'ly', 'tbsm', 'cdm' etc. but unfortunately there are in AUR at the time of writing this document.
-
-## Debian
-* When issuing `sudo python3 setup.py /dev/sdXY /dev/sdX /dev/sdXZ`, it might seem installer has frozen but it is actually doing its thing! Please be patient and you will get a prompt to initiate install in about 30 seconds! For some reason, it was not showing what is going on in a nice way, so I put a `set echo off` command.
-* Make sure not to miss sudo in the command above, otherwise there would be permission error when writing to /mnt/.snapshots/...
 
 ## Arch Linux
 ### AUR
@@ -578,14 +591,41 @@ and as a last resort, run: (CAUTION: This might have undesired effects)
 ash fixdb <snapshots>
 ```
 
+## Alpine
+* Currently, there is an erratic behaviour with package grub (NOT grub-efi which, even though latter depends on former) which results in having a damaged apk database on a fresh install / new snapshot! This as a result, makes `ash in` operations fail too as we are checking for errors. To fix this, run:
+
+```
+ash un -p grub-efi grub -s <snapshot-number>
+ash in -p grub-efi -s <snapshot-number>
+```
+
+## CachyOS
+* You can use either Arch iso or CachyOS iso for installation. Pass extra arguments if using former (look at examples above)
+* [CLI installer](https://sourceforge.net/projects/cachyos-arch/files/cli-installer/cli/) suffices, no need to download GUI installer.
+
+## Debian
+* When issuing `sudo python3 setup.py /dev/sdXY /dev/sdX /dev/sdXZ`, it might seem installer has frozen but it is actually doing its thing! Please be patient and you will get a prompt to initiate install in about 30 seconds! For some reason, it was not showing what is going on in a nice way, so I put a `set echo off` command.
+* Make sure not to miss sudo in the command above, otherwise there would be permission error when writing to /mnt/.snapshots/...
+
 ## EndeavourOS
 * Start the boot process from iso file
 * When GRUB is prompted, press keys 'e' and then END to add 'single' to the end of kernel parameters. When prompted about rescue mode, press Enter.
 * This will drop you to single user mode instead of default Desktop Environment
 * if internet access is not be available, run `sudo dhclient`
 * Otherwise if installing from within desktop environment, comment out "su" in endevouros_live.sh as it will ask for a password. Instead run the script as sudo.
+
+## Proxmox
+* Use Debian live iso-hybrid
+* Find latest version of pve-kernel_*-pve from http://download.proxmox.com/debian/dists/{RELEASE}/pve-no-subscription/binary-amd64/ and update KERNEL_VERSION.
+* `sudo python3 setup.py /dev/sdXY /dev/sdX /dev/sdXZ proxmox "Proxmox VE"`
+* Note for the package `postfix`: Configure packages which require user input on installation according to your needs. If you have a mail server in your network, you should configure postfix as a satellite system. Your existing mail server will then be the relay host which will route the emails sent by Proxmox VE to their final recipient. If you don't know what to enter here, choose local only and leave the system name as is.
+
+## Ubuntu
+* Download links: [Link 1](https://releases.ubuntu.com), [Link 2](https://launchpad.net/ubuntu/+cdmirrors)
+* In GRUB, you can pass `single` as an argument to linux kernel to boot in single mode and press Enter for maintenance (As no GUI is required for this installer, it is much faster to boot)
+* As of July 2022, Debian iso can't be used to bootstrap 'jammy' (zstd bug: https://bugs.debian.org/892664)
 ---
+
 
 **This project is licensed under the AGPLv3.**
 
-**Please note that, for the purpose of this project, comforming to 'pythonic' way was not a goal as in future, implementation might change to Rust, C, C++, etc. We would like to be as close to POSIX-compliant sans-bashism shell as possible.**
